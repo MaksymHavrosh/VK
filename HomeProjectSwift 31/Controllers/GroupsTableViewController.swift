@@ -13,7 +13,8 @@ class GroupsTableViewController: UITableViewController {
     var userID: Int = 0
     var groupsArray = [Group]()
     let groupsInRequest = 5
-
+    private var selectedGroupId: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -90,7 +91,7 @@ class GroupsTableViewController: UITableViewController {
             getGroupsFromServer(userID: userID)
         } else {
             
-            selectUserID = groupsArray[indexPath.row].groudID
+            selectedGroupId = groupsArray[indexPath.row].groudID
 
             self.performSegue(withIdentifier: "ShowGroupWall", sender: nil)
         }
@@ -99,9 +100,9 @@ class GroupsTableViewController: UITableViewController {
     //MARK: - Segue
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
-        let userController = segue.destination as! WallTableViewController
-        userController.userID = selectUserID!
+        if let userController = segue.destination as? WallTableViewController, let selectedGroupId = selectedGroupId {
+            userController.userID = selectedGroupId
+        }
 
     }
 

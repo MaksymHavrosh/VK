@@ -22,12 +22,13 @@ class ServerManager {
                 "v": "5.103"]
     }
     
-    func getUser(completion: @escaping (User) -> Void) {
+    func getUser(completion: @escaping (User?) -> Void) {
         guard let userId = accessToken?.userID else { return }
         getUserWithID(userID: userId, success: { (user) in
             completion(user)
         }) { (error) in
             print(error)
+            completion(nil)
         }
     }
     

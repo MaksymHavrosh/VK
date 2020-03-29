@@ -41,15 +41,15 @@ class UserViewController: UIViewController {
         
         if segue.destination.isKind(of: SubscriptionsTableViewController.self) {
             let userController = segue.destination as! SubscriptionsTableViewController
-            userController.userID = selectUserID!
+            userController.userID = userId
         }
         if segue.destination.isKind(of: FollowersTableViewController.self) {
             let userController = segue.destination as! FollowersTableViewController
-            userController.userID = selectUserID!
+            userController.userID = userId
         }
         if segue.destination.isKind(of: WallTableViewController.self) {
             let userController = segue.destination as! WallTableViewController
-            userController.userID = selectUserID!
+            userController.userID = userId
         }
     }
     
