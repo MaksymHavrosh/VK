@@ -25,7 +25,7 @@ class ServerManager: NSObject {
     
     func authorizeUzer(completion: @escaping (User) -> Void) {
         
-        let vc = LoginViewController.initWithCompletionBlock(block: { (token) in
+        let vc = LoginViewController.create(with: { (token) in
             
             self.accessToken = token
             

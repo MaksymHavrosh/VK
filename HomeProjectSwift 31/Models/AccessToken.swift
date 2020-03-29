@@ -8,10 +8,10 @@
 
 import UIKit
 
-class AccessToken: NSObject {
+struct AccessToken {
     
-    var token: String? = nil
-    var expirationDate: Date? = nil
-    var userID: Int? = nil
+    var token: String?
+    var expirationDate: Date?
+    var userID: Int?
 
 }
