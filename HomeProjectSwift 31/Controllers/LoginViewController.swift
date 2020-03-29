@@ -13,8 +13,8 @@ typealias LoginCompletionBlock = (AccessToken?) -> Void
 
 class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDelegate, WKUIDelegate {
     
-    var webView: WKWebView!
-    var completionBlock: LoginCompletionBlock!
+    let webView = WKWebView(frame: .zero)
+    var completionBlock: LoginCompletionBlock?
     
     class func initWithCompletionBlock(block: @escaping LoginCompletionBlock) -> LoginViewController {
         
@@ -27,22 +27,19 @@ class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        var r = view.bounds
-        r.origin = CGPoint.zero
-        
-        let webView = WKWebView(frame: r)
+                
+        webView.frame = view.bounds
         webView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         
         view.addSubview(webView)
-        
-        self.webView = webView
-        
+                
         navigationItem.title = "Login"
         
         let urlString = "https://oauth.vk.com/authorize?client_id=7299445&scope=139286&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&v=5.103&response_type=token"
         
-        let url = URL(string: urlString)!
+        guard let url = URL(string: urlString) else {
+            fatalError("Can't get url from string: \(urlString)")
+        }
         let request = URLRequest(url: url)
         
         webView.uiDelegate = self
@@ -59,18 +56,17 @@ class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDele
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
         let request = navigationAction.request.url
-        let requestString = request!.description
         
-        if requestString.contains("#access_token") {
+        if let requestString = request?.description, requestString.contains("#access_token") {
             
             let token = AccessToken()
             
-            var query = request!.description
+            var query = requestString
             
             let array = query.components(separatedBy: "#")
             
-            if array.count > 1 {
-                query = array.last!
+            if array.count > 1, let last = array.last {
+                query = last
             }
             
             let pairs = query.components(separatedBy: "&")
@@ -79,21 +75,19 @@ class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDele
                 
                 let values = pair.components(separatedBy: "=")
                 
-                if values.count == 2 {
+                if values.count == 2, let firstValue = values.first, let lastValue = values.last {
                     
-                    let key = values.first!
+                    let key = firstValue
                     
                     if key.contains("access_token") {
                         token.token = values.last
                         
-                    } else if key.contains("expires_in") {
-                        
-                        let interval = Double(values.last!)!
+                    } else if key.contains("expires_in"), let interval = Double(lastValue) {
                         
                         token.expirationDate = Date(timeIntervalSinceNow: interval)
                         
                     } else if key.contains("user_id") {
-                        token.userID = Int(values.last!)
+                        token.userID = Int(lastValue)
                         
                     } else {
                         print("Error")
@@ -102,9 +96,8 @@ class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDele
             }
             webView.uiDelegate = nil
             
-            if completionBlock != nil {
-                completionBlock(token)
-            }
+            completionBlock?(token)
+
             self.dismiss(animated: true, completion: nil)
             decisionHandler(.cancel)
         } else {
@@ -116,9 +109,8 @@ class LoginViewController: UIViewController, WKNavigationDelegate, UIWebViewDele
     
     @objc func actionCancel(item: UIBarButtonItem) {
         
-        if (completionBlock != nil) {
-            completionBlock(nil)
-        }
+        completionBlock?(nil)
+
         dismiss(animated: true, completion: nil)
     }
 
