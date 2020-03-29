@@ -25,7 +25,7 @@ class WallTableViewController: UITableViewController {
     
     func getWallFromServerForUserID(userID: Int) {
             
-        ServerManager.shareManager().getWallForUserID(userID: userID,
+        ServerManager.manager.getWallForUserID(userID: userID,
                                                       offset: postsArray.count,
                                                       count: postsInRequest,
                                                       success: { (posts) in

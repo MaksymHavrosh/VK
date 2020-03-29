@@ -23,7 +23,7 @@ class UserViewController: UIViewController {
     
     func getUserFromServer() {
         
-        ServerManager.shareManager().getUserWithID(userID: userId,
+        ServerManager.manager.getUserWithID(userID: userId,
                                                    success: { (user: User) in
                                                     
                                                     if (user.bigImageURL != nil) {

@@ -30,7 +30,7 @@ class FriendsViewController: UITableViewController {
             
             firstTimeAppear = false
             
-            ServerManager.shareManager().authorizeUzer { (user: User) in
+            ServerManager.manager.getUser { (user: User) in
                     
                     print("AUTHORIZED!")
                     print("\(user.firstName) \(user.lastName)")
@@ -44,7 +44,7 @@ class FriendsViewController: UITableViewController {
 
     func getFriendsFromServer() {
         
-        ServerManager.shareManager().getFriendsWithOffset(offset: friendsArray.count,
+        ServerManager.manager.getFriendsWithOffset(offset: friendsArray.count,
                                                           count: friendsInRequest,
                                                           success: { (friends: [User]) in
             

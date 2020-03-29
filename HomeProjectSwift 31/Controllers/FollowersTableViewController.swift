@@ -23,7 +23,7 @@ class FollowersTableViewController: UITableViewController {
     
     func getFollowersForUserID(usetID: Int) {
         
-        ServerManager.shareManager().getFollowersForUserID(userID: usetID,
+        ServerManager.manager.getFollowersForUserID(userID: usetID,
                                                            offset: followersArray.count,
                                                            count: followersInRequest,
                                                            success: { (followers: [User]) in

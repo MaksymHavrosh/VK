@@ -9,56 +9,40 @@
 import UIKit
 import Alamofire
 
-class ServerManager: NSObject {
+// TODO: Refactor all functions
+class ServerManager {
     
+    static let manager = ServerManager()
+
     var accessToken: AccessToken?
     
-    
-    static let manager: ServerManager = {
-        var manager = ServerManager()
-        return manager
-    }()
-    
-    class func shareManager() -> ServerManager {
-        return manager
+    private var sharedParams: [String: Any] {
+        let serviceToken = "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb"
+        return ["access_token": accessToken?.token ?? serviceToken,
+                "v": "5.103"]
     }
     
-    func authorizeUzer(completion: @escaping (User) -> Void) {
-        
-        let vc = LoginViewController.create(with: { (token) in
-            
-            self.accessToken = token
-            
-            guard self.accessToken?.userID != nil else { return }
-                
-                self.getUserWithID(userID: self.accessToken!.userID!,
-                              success: { (user) in
-                                completion(user)
-                }) { (error) in
-                    print(error)
-                }
-            })
-        
-        let nav = UINavigationController(rootViewController: vc)
-        let mainVC = UIApplication.shared.windows.first?.rootViewController
-        
-        mainVC?.present(nav,
-                        animated: true,
-                        completion: nil)
+    func getUser(completion: @escaping (User) -> Void) {
+        guard let userId = accessToken?.userID else { return }
+        getUserWithID(userID: userId, success: { (user) in
+            completion(user)
+        }) { (error) in
+            print(error)
+        }
     }
     
     func getFriendsWithOffset(offset: Int, count: Int, success: @escaping ([User]) -> Void, failure: @escaping (Error) -> Void) {
+        guard let id = accessToken?.userID else {
+            failure(ServerManagerError.noAccessToken)
+            return
+        }
         
-        guard let id = accessToken?.userID else { return }
-        
-        let params: [String : Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                      "v" : "5.103",
-                                      "user_id" : id,
-                                      "fields" : "photo_100",
-                                      "redirect_uri" : "https://oauth.vk.com/blank.html",
-                                      "order" : "name",
-                                      "count" : count,
-                                      "offset" : offset]
+        let params: [String : Any] = sharedParams + ["user_id" : id,
+                                                     "fields" : "photo_100",
+                                                     "redirect_uri" : "https://oauth.vk.com/blank.html",
+                                                     "order" : "name",
+                                                     "count" : count,
+                                                     "offset" : offset]
         
         AF.request("https://api.vk.com/method/friends.get",
                            method: .get,
@@ -90,11 +74,9 @@ class ServerManager: NSObject {
     
     func getUserWithID(userID: Int, success: @escaping (User) -> Void, failure: @escaping (Error) -> Void) {
         
-        let params: [String : Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                      "v" : "5.103",
-                                      "user_ids" : userID,
-                                      "redirect_uri" : "https://oauth.vk.com/blank.html",
-                                      "fields" : ["photo_400_orig", "bdate"]]
+        let params: [String : Any] = sharedParams + ["user_ids" : userID,
+                                                     "redirect_uri" : "https://oauth.vk.com/blank.html",
+                                                     "fields" : ["photo_400_orig", "bdate"]]
         
         AF.request("https://api.vk.com/method/users.get",
                    method: .get,
@@ -105,15 +87,17 @@ class ServerManager: NSObject {
                     
                     switch response.result{
                     case .success(let value):
-                        
-                        let dictObject = (value as! [String : Any])["response"] as? [Any]
-
-                        let user = User(dict: dictObject?.first as! [String : Any])
-                        
+                        guard let value = value as? [String: Any],
+                            let dictObject = value["response"] as? [Any],
+                            let userDict = dictObject.first as? [String: Any]
+                            else {
+                                failure(VKApiError.noUserWithId(id: userID))
+                                return
+                            }
+                        let user = User(dict: userDict)
                         success(user)
                         
                     case .failure(let error):
-                        
                         failure(error)
                     }
         }
@@ -122,14 +106,12 @@ class ServerManager: NSObject {
     func getSubscriptionsForUserID(userID: Int, offset: Int, count: Int,
                                    success: @escaping ([Group]) -> Void, failure: @escaping (Error) -> Void) {
         
-        let params: [String : Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                      "user_id" : userID,
-                                      "redirect_uri" : "https://oauth.vk.com/blank.html",
-                                      "offset" : offset,
-                                      "count" : count,
-                                      "fields" : ["name", "photo_100"],
-                                      "v" : "5.103",
-                                      "extended" : 1]
+        let params: [String : Any] = sharedParams + ["user_id" : userID,
+                                                     "redirect_uri" : "https://oauth.vk.com/blank.html",
+                                                     "offset" : offset,
+                                                     "count" : count,
+                                                     "fields" : ["name", "photo_100"],
+                                                     "extended" : 1]
         
         AF.request("https://api.vk.com/method/users.getSubscriptions",
                    method: .get,
@@ -162,13 +144,11 @@ class ServerManager: NSObject {
     func getFollowersForUserID(userID: Int, offset: Int, count: Int,
                                success: @escaping ([User]) -> Void, failure: @escaping (Error) -> Void) {
         
-        let params: [String: Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                     "user_id" : userID,
-                                     "redirect_uri" : "https://oauth.vk.com/blank.html",
-                                     "offset" : offset,
-                                     "count" : count,
-                                     "fields" : ["photo_100"],
-                                     "v" : "5.103"]
+        let params: [String: Any] = sharedParams + ["user_id" : userID,
+                                                    "redirect_uri" : "https://oauth.vk.com/blank.html",
+                                                    "offset" : offset,
+                                                    "count" : count,
+                                                    "fields" : ["photo_100"]]
         
         AF.request("https://api.vk.com/method/users.getFollowers",
                    method: .get,
@@ -201,14 +181,12 @@ class ServerManager: NSObject {
     func getWallForUserID(userID: Int, offset: Int, count: Int,
                           success: @escaping ([Post]) -> Void, failure: @escaping (Error) -> Void) {
         
-        let params: [String : Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                      "owner_id" : userID,
-//                                      "extended" : 1,
-//                                      "fields" : "all",
-                                      "offset" : offset,
-                                      "count" : count,
-                                      "filter" : "all",
-                                      "v" : "5.103"]
+        let params: [String : Any] = sharedParams + ["owner_id" : userID,
+//                                                     "extended" : 1,
+//                                                     "fields" : "all",
+                                                     "offset" : offset,
+                                                     "count" : count,
+                                                     "filter" : "all"]
         
         AF.request("https://api.vk.com/method/wall.get",
                    method: .get,
@@ -247,16 +225,17 @@ class ServerManager: NSObject {
     func getSubscriptionsForOwner(userID: Int, offset: Int, count: Int,
                                    success: @escaping ([Group]) -> Void, failure: @escaping (Error) -> Void) {
         
-        guard let id = accessToken?.userID else { return }
+        guard let id = accessToken?.userID else {
+            failure(ServerManagerError.noAccessToken)
+            return
+        }
         
-        let params: [String : Any] = ["access_token" : accessToken?.token ?? "72af3c1d72af3c1d72af3c1d9572c05d68772af72af3c1d2c9e03efcc838f15345a65eb",
-                                      "user_id" : id,
-                                      "redirect_uri" : "https://oauth.vk.com/blank.html",
-                                      "offset" : offset,
-                                      "count" : count,
-                                      "fields" : ["name", "photo_100"],
-                                      "v" : "5.103",
-                                      "extended" : 1]
+        let params: [String : Any] = sharedParams + ["user_id" : id,
+                                                     "redirect_uri" : "https://oauth.vk.com/blank.html",
+                                                     "offset" : offset,
+                                                     "count" : count,
+                                                     "fields" : ["name", "photo_100"],
+                                                     "extended" : 1]
         
         AF.request("https://api.vk.com/method/users.getSubscriptions",
                    method: .get,
@@ -288,4 +267,12 @@ class ServerManager: NSObject {
         
     }
 
+// MARK: - Errors
 
+enum ServerManagerError: Error {
+    case noAccessToken
+}
+
+enum VKApiError: Error {
+    case noUserWithId(id: Int)
+}

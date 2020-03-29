@@ -40,6 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        showLoginViewController()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -51,3 +52,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 }
 
+// MARK: - Private
+
+private extension SceneDelegate {
+    
+    func showLoginViewController() {
+        let loginViewConroler = LoginViewController.create(with: { (token) in
+            ServerManager.manager.accessToken = token
+        })
+
+        guard let mainVC = window?.rootViewController else { return }
+        let nav = UINavigationController(rootViewController: loginViewConroler)
+        nav.modalPresentationStyle = .fullScreen
+        mainVC.present(nav, animated: false)
+    }
+    
+}

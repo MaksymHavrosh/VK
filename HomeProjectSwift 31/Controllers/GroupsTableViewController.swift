@@ -22,7 +22,7 @@ class GroupsTableViewController: UITableViewController {
     
     func getGroupsFromServer(userID: Int) {
         
-        ServerManager.shareManager().getSubscriptionsForOwner(userID: userID,
+        ServerManager.manager.getSubscriptionsForOwner(userID: userID,
                                                                offset: groupsArray.count,
                                                                count: groupsInRequest,
                                                                success: { (groups) in
