@@ -9,7 +9,6 @@
 import UIKit
 import Alamofire
 
-// TODO: Refactor all functions
 class ServerManager {
     
     static let manager = ServerManager()
@@ -55,8 +54,12 @@ class ServerManager {
                             switch response.result {
                             case .success(let value):
                                 
-                                let dictionary = (value as? [String: Any])?["response"] as! [String : Any]
-                                let dictsArray = dictionary["items"] as! [[String : Any]]
+                                guard let dictionary = value as? [String: Any],
+                                    let dictObject = dictionary["response"] as? [String: Any],
+                                    let dictsArray = dictObject["items"] as? [[String: Any]] else {
+                                        failure(VKApiError.noFriendsInRequestForUserID(id: id))
+                                        return
+                                }
                                 
                                 var objectsArray = [User]()
                                 
@@ -124,16 +127,17 @@ class ServerManager {
                     switch response.result{
                     case .success(let value):
                         
-                        let dictionary = (value as? [String: Any])?["response"] as! [String : Any]
-                        let dictsArray = dictionary["items"] as! [[String : Any]]
-                        
+                        guard let dictionary = value as? [String: Any],
+                            let dictObject = dictionary["response"] as? [String: Any],
+                            let dictsArray = dictObject["items"] as? [[String: Any]] else {
+                                failure(VKApiError.noSubscriptionsForUserID(id: userID))
+                                return
+                        }
                         var objectsArray = [Group]()
-                        
                         for dict in dictsArray {
                             let user = Group(dict: dict)
                             objectsArray.append(user)
                         }
-                        
                         success(objectsArray)
                         
                     case .failure(let error):
@@ -161,16 +165,17 @@ class ServerManager {
                     switch response.result{
                     case .success(let value):
                         
-                        let dictionary = (value as? [String: Any])?["response"] as! [String : Any]
-                        let dictsArray = dictionary["items"] as! [[String : Any]]
-                        
+                        guard let dictionary = value as? [String: Any],
+                            let dictsObject = dictionary["response"] as? [String: Any],
+                            let dictsArray = dictsObject["items"] as? [[String: Any]] else {
+                                failure(VKApiError.noFollowersForUserID(id: userID))
+                                return
+                        }
                         var objectsArray = [User]()
-                        
                         for dict in dictsArray {
                             let user = User(dict: dict)
                             objectsArray.append(user)
                         }
-                        
                         success(objectsArray)
                         
                     case .failure(let error):
@@ -183,8 +188,6 @@ class ServerManager {
                           success: @escaping ([Post]) -> Void, failure: @escaping (Error) -> Void) {
         
         let params: [String : Any] = sharedParams + ["owner_id" : userID,
-//                                                     "extended" : 1,
-//                                                     "fields" : "all",
                                                      "offset" : offset,
                                                      "count" : count,
                                                      "filter" : "all"]
@@ -197,24 +200,24 @@ class ServerManager {
                    interceptor: nil).responseJSON { (response) in
                     
                     switch response.result {
-                        
                     case .success(let value):
                         
                         if let error = (value as? [String: Any])?["error"] {
                             print(error)
                         }
                         
-                        guard let dictionary = (value as? [String: Any])?["response"] else { return }
-                        
-                        let dictsArray = (dictionary as! [String : Any])["items"] as! [[String : Any]]
-                        
+                        guard let dictionary = value as? [String: Any],
+                            let dictsObject = dictionary["response"] as? [String: Any],
+                            let dictsArray = dictsObject["items"] as? [[String: Any]]
+                            else {
+                                failure(VKApiError.noWallForUserID(id: userID))
+                                return
+                        }
                         var objectsArray = [Post]()
-                        
                         for dict in dictsArray {
                             let post = Post(dict: dict)
                             objectsArray.append(post)
                         }
-                        
                         success(objectsArray)
                         
                     case .failure(let error):
@@ -248,16 +251,18 @@ class ServerManager {
                     switch response.result{
                     case .success(let value):
                         
-                        let dictionary = (value as? [String: Any])?["response"] as! [String : Any]
-                        let dictsArray = dictionary["items"] as! [[String : Any]]
-                        
+                        guard let dictionary = value as? [String: Any],
+                            let dictsObject = dictionary["response"] as? [String : Any],
+                            let dictsArray = dictsObject["items"] as? [[String : Any]]
+                            else {
+                                failure(VKApiError.noSubscriptionsForUserID(id: id))
+                                return
+                        }
                         var objectsArray = [Group]()
-                        
                         for dict in dictsArray {
                             let user = Group(dict: dict)
                             objectsArray.append(user)
                         }
-                        
                         success(objectsArray)
                         
                     case .failure(let error):
@@ -276,4 +281,9 @@ enum ServerManagerError: Error {
 
 enum VKApiError: Error {
     case noUserWithId(id: Int)
+    case noWallForUserID(id: Int)
+    case noSubscriptionsForId(id: Int)
+    case noFollowersForUserID(id: Int)
+    case noSubscriptionsForUserID(id: Int)
+    case noFriendsInRequestForUserID(id: Int)
 }
