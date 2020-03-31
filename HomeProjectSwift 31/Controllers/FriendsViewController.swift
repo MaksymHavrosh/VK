@@ -46,11 +46,6 @@ class FriendsViewController: UITableViewController {
             
             userController.userId = selectUserID
         }
-        
-//        if segue.destination.isKind(of: GroupsTableViewController.self) {
-//            let userController = segue.destination as! GroupsTableViewController
-//            userController.userID = selectUserID!
-//        }
     }
     
 }

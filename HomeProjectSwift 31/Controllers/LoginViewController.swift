@@ -9,12 +9,12 @@
 import UIKit
 import WebKit
 
-// TODO: Move LoginViewController to storyboard
 class LoginViewController: UIViewController {
     
     typealias LoginCompletion = (AccessToken?) -> Void
     
-    private let webView = WKWebView(frame: .zero)
+    @IBOutlet var webView: WKWebView!
+    
     private var completionBlock: LoginCompletion?
     
     class func create(with completion: @escaping LoginCompletion) -> LoginViewController {
@@ -25,12 +25,14 @@ class LoginViewController: UIViewController {
     
     // MARK: - Lifecycle
     
+    override func loadView() {
+        let webConfiguration = WKWebViewConfiguration()
+        webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        view = webView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-                
-        webView.frame = view.bounds
-        webView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        view.addSubview(webView)
                 
         navigationItem.title = "Login"
         
@@ -45,14 +47,6 @@ class LoginViewController: UIViewController {
         
         webView.load(request)
     }
-    
-    // MARK: - Actions
-    
-    @objc func actionCancel(item: UIBarButtonItem) {
-        completionBlock?(nil)
-        dismiss(animated: true, completion: nil)
-    }
-
 }
 
 // MARK: - WKNavigationDelegate
@@ -89,13 +83,12 @@ extension LoginViewController: WKNavigationDelegate {
                         token.userID = Int(lastValue)
                         
                     } else {
-                        print("Error") // TODO: Explain that error
+                        print("Not validate key: \(key)")
                     }
                 }
             }
             
             completionBlock?(token)
-
             dismiss(animated: true, completion: nil)
             decisionHandler(.cancel)
             
