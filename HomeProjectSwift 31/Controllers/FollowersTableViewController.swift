@@ -55,32 +55,26 @@ class FollowersTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let identifier = "Cell"
-        
-        var cell = tableView.dequeueReusableCell(withIdentifier: identifier)
-        
-        if cell == nil {
-            cell = UITableViewCell(style: .default, reuseIdentifier: identifier)
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FollowersCell", for: indexPath)
         
         if indexPath.row == followersArray.count {
-            cell?.textLabel?.text = "Load more"
-            cell?.imageView?.image = nil
+            cell.textLabel?.text = "Load more"
+            cell.imageView?.image = nil
             
         } else {
             
             let follower = followersArray[indexPath.row]
             
-            cell?.textLabel?.text = "\(follower.firstName) \(follower.lastName)"
-            cell?.textLabel?.font = .boldSystemFont(ofSize: 16)
+            cell.textLabel?.text = "\(follower.firstName) \(follower.lastName)"
+            cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             
-            guard let imageURL = follower.imageURL else { return cell! }
+            guard let imageURL = follower.imageURL else { return cell }
             
             let imageRequest = URLRequest(url: imageURL)
             
-            cell?.imageView?.af.setImage(withURLRequest: imageRequest)
+            cell.imageView?.af.setImage(withURLRequest: imageRequest)
         }
-        return cell!
+        return cell
     }
     
     //MARK: -UITableViewDelegate
@@ -93,21 +87,5 @@ class FollowersTableViewController: UITableViewController {
             getFollowersForUserID(usetID: userID)
             
         }
-//        else {
-//
-//            selectUserID = friendsArray[indexPath.row].userID
-//
-//            self.performSegue(withIdentifier: "ShowFollower", sender: nil)
-//
-//        }
-        
-//        //MARK: - Segue
-//
-//        func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//
-//            let userController = segue.destination as! UserViewController
-//            userController.userId = selectUserID!
-//
-//        }
     }
 }

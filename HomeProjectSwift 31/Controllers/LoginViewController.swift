@@ -13,26 +13,24 @@ class LoginViewController: UIViewController {
     
     typealias LoginCompletion = (AccessToken?) -> Void
     
-    @IBOutlet var webView: WKWebView!
+    @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     private var completionBlock: LoginCompletion?
     
     class func create(with completion: @escaping LoginCompletion) -> LoginViewController {
-        let vc = LoginViewController()
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(identifier: "LoginViewController") as LoginViewController
         vc.completionBlock = completion
         return vc
     }
     
     // MARK: - Lifecycle
     
-    override func loadView() {
-        let webConfiguration = WKWebViewConfiguration()
-        webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        view = webView
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        activityIndicator.startAnimating()
                 
         navigationItem.title = "Login"
         
@@ -95,6 +93,10 @@ extension LoginViewController: WKNavigationDelegate {
         } else {
             decisionHandler(.allow)
         }
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        activityIndicator.stopAnimating()
     }
     
 }

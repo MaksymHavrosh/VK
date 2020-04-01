@@ -10,15 +10,15 @@ import UIKit
 
 class Post: NSObject {
     
-    var text: String
-    var imageURL: URL? = nil
+    var text: String?
+    var imageURL: URL?
     
     init(dict: [String : Any]) {
         
-        let text = dict["text"] as! String
+        guard let text = dict["text"] as? String else { return }
         
         if text != "" {
-            self.text = dict["text"] as! String
+            self.text = dict["text"] as? String
         } else {
             self.text = " "
         }

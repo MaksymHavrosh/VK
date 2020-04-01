@@ -53,42 +53,38 @@ class GroupsTableViewController: UITableViewController {
         return groupsArray.count + 1
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let identifier = "GroupCell"
-        
-        var cell = tableView.dequeueReusableCell(withIdentifier: identifier)
-        
-        if cell == nil {
-            cell = UITableViewCell(style: .default, reuseIdentifier: identifier)
-        }
-        
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell { 
         if indexPath.row == groupsArray.count {
-            cell?.textLabel?.text = "Load more"
-            cell?.imageView?.image = nil
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadMoreGroups", for: indexPath)
+            cell.textLabel?.text = "Load more"
+            cell.imageView?.image = nil
+            
+            return cell
+            
         } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "GroupCell", for: indexPath)
             
             let group = groupsArray[indexPath.row] as Group
             
-            cell?.textLabel?.text = group.name
-            cell?.textLabel?.font = .boldSystemFont(ofSize: 16)
+            cell.textLabel?.text = group.name
+            cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             
-            guard let imageURL = group.imageURL else { return cell! }
+            guard let imageURL = group.imageURL else { return cell }
             
             let imageRequest = URLRequest(url: imageURL)
-            cell?.imageView?.af.setImage(withURLRequest: imageRequest)
+            cell.imageView?.af.setImage(withURLRequest: imageRequest)
             
-            cell?.accessoryType = .disclosureIndicator
+            cell.accessoryType = .disclosureIndicator
+            
+            return cell
         }
-        return cell!
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.deselectRow(at: indexPath, animated: true)
-        
         if indexPath.row == groupsArray.count {
             getGroupsFromServer(userID: userID)
+            tableView.deselectRow(at: indexPath, animated: true)
         } else {
             
             selectedGroupId = groupsArray[indexPath.row].groudID
@@ -103,7 +99,6 @@ class GroupsTableViewController: UITableViewController {
         if let userController = segue.destination as? WallTableViewController, let selectedGroupId = selectedGroupId {
             userController.userID = selectedGroupId
         }
-
     }
 
 }

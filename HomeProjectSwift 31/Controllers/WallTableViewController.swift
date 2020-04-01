@@ -59,18 +59,12 @@ class WallTableViewController: UITableViewController {
         
         if indexPath.row == postsArray.count {
             
-            let identifier = "Cell"
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadMorePosts", for: indexPath)
             
-            var cell = tableView.dequeueReusableCell(withIdentifier: identifier)
+            cell.textLabel?.text = "Load more"
+            cell.imageView?.image = nil
             
-            if cell == nil {
-                cell = UITableViewCell(style: .default, reuseIdentifier: identifier)
-            }
-            
-            cell?.textLabel?.text = "Load more"
-            cell?.imageView?.image = nil
-            
-            return cell!
+            return cell
             
         } else {
             
@@ -78,33 +72,28 @@ class WallTableViewController: UITableViewController {
             
             if let imageURL = post.imageURL {
                 
-                let identifier = "PostCell"
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as? WallTableViewCell else {
+                    return UITableViewCell()
+                }
                 
-                let cell = tableView.dequeueReusableCell(withIdentifier: identifier) as? WallTableViewCell
-                
-                cell?.postImage.image = #imageLiteral(resourceName: "Question")
-                
-                cell?.postTextLabel.text = post.text
+                cell.postImage.image = #imageLiteral(resourceName: "Question")
+                cell.postTextLabel.text = post.text
                 
                 let imageRequest = URLRequest(url: imageURL)
-                cell?.postImage.af.setImage(withURLRequest: imageRequest)
+                cell.postImage.af.setImage(withURLRequest: imageRequest)
                 
-                return cell!
+                return cell
             } else {
                 
-                let identifier = "TextPost"
-                
-                var cell = tableView.dequeueReusableCell(withIdentifier: identifier) as? TextPostTableViewCell
-                
-                if cell == nil {
-                    cell = TextPostTableViewCell(style: .default, reuseIdentifier: identifier)
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: "TextPost", for: indexPath) as? TextPostTableViewCell else {
+                    return UITableViewCell()
                 }
                 
                 tableView.rowHeight = UITableView.automaticDimension
-                cell?.textPostLabel?.text = post.text
-                cell?.imageView?.image = nil
+                cell.textPostLabel?.text = post.text
+                cell.imageView?.image = nil
                 
-                return cell!
+                return cell
             }
         }
     }

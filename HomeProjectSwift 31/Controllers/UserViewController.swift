@@ -26,8 +26,8 @@ class UserViewController: UIViewController {
         ServerManager.manager.getUserWithID(userID: userId,
                                                    success: { (user: User) in
                                                     
-                                                    if (user.bigImageURL != nil) {
-                                                        self.avatarImageView.af.setImage(withURL: user.bigImageURL!)
+                                                    if let url = user.bigImageURL  {
+                                                        self.avatarImageView.af.setImage(withURL: url)
                                                     }
                                                     self.fullNameLabel.text = "\(user.firstName) \(user.lastName)"
                                                     
@@ -39,16 +39,16 @@ class UserViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.destination.isKind(of: SubscriptionsTableViewController.self) {
-            let userController = segue.destination as! SubscriptionsTableViewController
+        if segue.destination.isKind(of: SubscriptionsTableViewController.self),
+            let userController = segue.destination as? SubscriptionsTableViewController {
             userController.userID = userId
         }
-        if segue.destination.isKind(of: FollowersTableViewController.self) {
-            let userController = segue.destination as! FollowersTableViewController
+        if segue.destination.isKind(of: FollowersTableViewController.self),
+            let userController = segue.destination as? FollowersTableViewController {
             userController.userID = userId
         }
-        if segue.destination.isKind(of: WallTableViewController.self) {
-            let userController = segue.destination as! WallTableViewController
+        if segue.destination.isKind(of: WallTableViewController.self),
+            let userController = segue.destination as? WallTableViewController { 
             userController.userID = userId
         }
     }

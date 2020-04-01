@@ -89,7 +89,7 @@ extension FriendsViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == friendsArray.count {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadMoreCell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LoadMoreFriends", for: indexPath)
             cell.textLabel?.text = "Load more"
             cell.imageView?.image = nil
             return cell
@@ -119,6 +119,9 @@ extension FriendsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == friendsArray.count {
             getFriendsFromServer()
+            tableView.deselectRow(at: indexPath, animated: true)
+        } else {
+            self.performSegue(withIdentifier: "ShowUserWall", sender: nil)
         }
     }
     
