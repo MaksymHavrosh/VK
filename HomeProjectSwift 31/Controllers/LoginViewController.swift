@@ -8,6 +8,7 @@
 
 import UIKit
 import WebKit
+import CoreData
 
 class LoginViewController: UIViewController {
     
@@ -29,7 +30,6 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         activityIndicator.startAnimating()
                 
         navigationItem.title = "Login"
@@ -47,6 +47,32 @@ class LoginViewController: UIViewController {
     }
 }
 
+// MARK: - Core Data stack
+
+var persistentContainer: NSPersistentContainer = {
+    let container = NSPersistentContainer(name: "HomeProjectSwift31")
+    container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        if let error = error as NSError? {
+            fatalError("Unresolved error \(error), \(error.userInfo)")
+        }
+    })
+    return container
+}()
+
+// MARK: - Core Data Saving support
+
+func saveContext () {
+    let context = persistentContainer.viewContext
+    if context.hasChanges {
+        do {
+            try context.save()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+}
+
 // MARK: - WKNavigationDelegate
 
 extension LoginViewController: WKNavigationDelegate {
@@ -56,6 +82,7 @@ extension LoginViewController: WKNavigationDelegate {
         
         if let requestString = request?.description, requestString.contains("#access_token") {
             var token = AccessToken()
+            let tokenCD = NSEntityDescription.insertNewObject(forEntityName: "Token", into: persistentContainer.viewContext)
             var query = requestString
             let array = query.components(separatedBy: "#")
             
@@ -73,17 +100,27 @@ extension LoginViewController: WKNavigationDelegate {
                     
                     if key.contains("access_token") {
                         token.token = values.last
+                        tokenCD.setValue(token.token, forKey: "token")
                         
                     } else if key.contains("expires_in"), let interval = Double(lastValue) {
                         token.expirationDate = Date(timeIntervalSinceNow: interval)
+                        tokenCD.setValue(token.expirationDate, forKey: "expirationDate")
                         
                     } else if key.contains("user_id") {
                         token.userID = Int(lastValue)
+                        tokenCD.setValue(token.userID, forKey: "userID")
                         
                     } else {
                         print("Not validate key: \(key)")
                     }
                 }
+            }
+            
+            do {
+                try persistentContainer.viewContext.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
             
             completionBlock?(token)

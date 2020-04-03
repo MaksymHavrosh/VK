@@ -115,7 +115,6 @@
                 <navigationController id="5PP-hN-RFg" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Groups" id="VKH-43-xkb"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="OfK-YK-FYb">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -447,7 +446,6 @@
                 <navigationController id="Jyp-go-JVQ" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Friends" id="9Hr-bX-AjI"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="fwG-2m-GiL">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>

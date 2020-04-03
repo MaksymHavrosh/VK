@@ -21,6 +21,16 @@ class ServerManager {
                 "v": "5.103"]
     }
     
+    func initAccessToken(token: String, userId: Int, expirationDate: Date) {
+        var AT = AccessToken()
+        
+        AT.token = token
+        AT.userID = userId
+        AT.expirationDate = expirationDate
+        
+        accessToken = AT
+    }
+    
     func getUser(completion: @escaping (User?) -> Void) {
         guard let userId = accessToken?.userID else { return }
         getUserWithID(userID: userId, success: { (user) in
