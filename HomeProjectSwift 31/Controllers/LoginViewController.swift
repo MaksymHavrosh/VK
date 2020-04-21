@@ -14,8 +14,8 @@ class LoginViewController: UIViewController {
     
     typealias LoginCompletion = (AccessToken?) -> Void
     
-    @IBOutlet weak var webView: WKWebView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet var webView: WKWebView!
+    @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
     private var completionBlock: LoginCompletion?
     
@@ -81,39 +81,10 @@ extension LoginViewController: WKNavigationDelegate {
         let request = navigationAction.request.url
         
         if let requestString = request?.description, requestString.contains("#access_token") {
-            var token = AccessToken()
-            let tokenCD = NSEntityDescription.insertNewObject(forEntityName: "Token", into: persistentContainer.viewContext)
-            var query = requestString
-            let array = query.components(separatedBy: "#")
+            let accessToken = AccessToken(requestString: requestString)
             
-            if array.count > 1, let last = array.last {
-                query = last
-            }
-            
-            let pairs = query.components(separatedBy: "&")
-            
-            for pair in pairs {
-                let values = pair.components(separatedBy: "=")
-                
-                if values.count == 2, let firstValue = values.first, let lastValue = values.last {
-                    let key = firstValue
-                    
-                    if key.contains("access_token") {
-                        token.token = values.last
-                        tokenCD.setValue(token.token, forKey: "token")
-                        
-                    } else if key.contains("expires_in"), let interval = Double(lastValue) {
-                        token.expirationDate = Date(timeIntervalSinceNow: interval)
-                        tokenCD.setValue(token.expirationDate, forKey: "expirationDate")
-                        
-                    } else if key.contains("user_id") {
-                        token.userID = Int(lastValue)
-                        tokenCD.setValue(token.userID, forKey: "userID")
-                        
-                    } else {
-                        print("Not validate key: \(key)")
-                    }
-                }
+            if let token = accessToken {
+                Token.create(from: token)
             }
             
             do {
@@ -123,7 +94,7 @@ extension LoginViewController: WKNavigationDelegate {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
             
-            completionBlock?(token)
+            completionBlock?(accessToken)
             dismiss(animated: true, completion: nil)
             decisionHandler(.cancel)
             

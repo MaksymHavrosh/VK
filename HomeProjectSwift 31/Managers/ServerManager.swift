@@ -22,13 +22,7 @@ class ServerManager {
     }
     
     func initAccessToken(token: String, userId: Int, expirationDate: Date) {
-        var AT = AccessToken()
-        
-        AT.token = token
-        AT.userID = userId
-        AT.expirationDate = expirationDate
-        
-        accessToken = AT
+        accessToken = AccessToken(token: token, expirationDate: expirationDate, userID: userId)
     }
     
     func getUser(completion: @escaping (User?) -> Void) {
@@ -225,7 +219,7 @@ class ServerManager {
                         }
                         var objectsArray = [Post]()
                         for dict in dictsArray {
-                            let post = Post(dict: dict)
+                            guard let post = Post(dict: dict) else { continue }
                             objectsArray.append(post)
                         }
                         success(objectsArray)

@@ -28,7 +28,8 @@ class WallTableViewController: UITableViewController {
         ServerManager.manager.getWallForUserID(userID: userID,
                                                       offset: postsArray.count,
                                                       count: postsInRequest,
-                                                      success: { (posts) in
+                                                      success: { [weak self] (posts) in // TODO: Розібратися коли `[weak self]` потрібно і коли ні
+                                                        guard let self = self else { return }
                                                         
                                                         self.postsArray.append(contentsOf: posts)
                                                         
@@ -61,7 +62,7 @@ class WallTableViewController: UITableViewController {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "LoadMorePosts", for: indexPath)
             
-            cell.textLabel?.text = "Load more"
+            cell.textLabel?.text = NSLocalizedString("Load more", comment: "")
             cell.imageView?.image = nil
             
             return cell
@@ -72,9 +73,7 @@ class WallTableViewController: UITableViewController {
             
             if let imageURL = post.imageURL {
                 
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as? WallTableViewCell else {
-                    return UITableViewCell()
-                }
+                let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: WallTableViewCell.self), for: indexPath) as! WallTableViewCell
                 
                 cell.postImage.image = #imageLiteral(resourceName: "Question")
                 cell.postTextLabel.text = post.text

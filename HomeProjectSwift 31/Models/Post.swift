@@ -8,20 +8,16 @@
 
 import UIKit
 
-class Post: NSObject {
+class Post {
     
-    var text: String?
+    var text: String
     var imageURL: URL?
     
-    init(dict: [String : Any]) {
+    init?(dict: [String : Any]) {
         
-        guard let text = dict["text"] as? String else { return }
+        guard let text = dict["text"] as? String, !text.isEmpty else { return nil }
         
-        if text != "" {
-            self.text = dict["text"] as? String
-        } else {
-            self.text = " "
-        }
+        self.text = text
         
         guard let attach = (dict)["attachments"] as? [[String: Any]] else { return }
             

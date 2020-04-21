@@ -1,0 +1,21 @@
+/* Class = "UITabBarItem"; title = "Friends"; ObjectID = "9Hr-bX-AjI"; */
+"9Hr-bX-AjI.title" = "Friends";
+
+/* Class = "UINavigationItem"; title = "Groups"; ObjectID = "C9r-Oh-t30"; */
+"C9r-Oh-t30.title" = "Groups";
+
+/* Class = "UIButton"; normalTitle = "Followers"; ObjectID = "Emh-P4-aNb"; */
+"Emh-P4-aNb.normalTitle" = "Followers";
+
+/* Class = "UINavigationItem"; title = "Friends"; ObjectID = "fEa-L2-I23"; */
+"fEa-L2-I23.title" = "Friends";
+
+/* Class = "UIButton"; normalTitle = "Subscriptions"; ObjectID = "FuJ-NM-QyG"; */
+"FuJ-NM-QyG.normalTitle" = "Subscriptions";
+
+/* Class = "UIButton"; normalTitle = "Wall"; ObjectID = "H4x-E8-nvp"; */
+"H4x-E8-nvp.normalTitle" = "Wall";
+
+/* Class = "UITabBarItem"; title = "Groups"; ObjectID = "VKH-43-xkb"; */
+"VKH-43-xkb.title" = "Groups";
+
