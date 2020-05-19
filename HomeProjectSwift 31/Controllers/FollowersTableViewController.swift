@@ -55,14 +55,14 @@ class FollowersTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "FollowersCell", for: indexPath)
-        
         if indexPath.row == followersArray.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "FollowersCell", for: indexPath)
             cell.textLabel?.text = "Load more"
             cell.imageView?.image = nil
+            return cell
             
         } else {
-            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "loadMoreFollowers", for: indexPath)
             let follower = followersArray[indexPath.row]
             
             cell.textLabel?.text = "\(follower.firstName) \(follower.lastName)"
@@ -73,8 +73,8 @@ class FollowersTableViewController: UITableViewController {
             let imageRequest = URLRequest(url: imageURL)
             
             cell.imageView?.af.setImage(withURLRequest: imageRequest)
+            return cell
         }
-        return cell
     }
     
     //MARK: -UITableViewDelegate

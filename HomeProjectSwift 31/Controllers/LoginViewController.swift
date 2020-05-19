@@ -18,6 +18,7 @@ class LoginViewController: UIViewController {
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
     private var completionBlock: LoginCompletion?
+    private let urlString = "https://oauth.vk.com/authorize?client_id=7299445&scope=204822&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&v=5.103&response_type=token"  // + 2 + 4 + 16 + 131072 + 8192 + 65536 = 204822 (scope)
     
     class func create(with completion: @escaping LoginCompletion) -> LoginViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -31,18 +32,12 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         activityIndicator.startAnimating()
-                
         navigationItem.title = "Login"
-        
-        let urlString = "https://oauth.vk.com/authorize?client_id=7299445&scope=139286&redirect_uri=https://oauth.vk.com/blank.html&display=mobile&v=5.103&response_type=token"
 
-        guard let url = URL(string: urlString) else {
-            fatalError("Can't get url from string: \(urlString)")
-        }
+        guard let url = URL(string: urlString) else { fatalError("Can't get url from string: \(urlString)") }
         let request = URLRequest(url: url)
         
         webView.navigationDelegate = self
-        
         webView.load(request)
     }
 }

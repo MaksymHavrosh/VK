@@ -54,13 +54,14 @@ class SubscriptionsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriptionsCell", for: indexPath)
-        
         if indexPath.row == groupsArray.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "loadMoreSubscriptions", for: indexPath)
             cell.textLabel?.text = "Load more"
             cell.imageView?.image = nil
-        } else {
+            return cell
             
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriptionsCell", for: indexPath)
             let group = groupsArray[indexPath.row] as Group
             
             cell.textLabel?.text = group.name
@@ -70,8 +71,8 @@ class SubscriptionsTableViewController: UITableViewController {
             
             let imageRequest = URLRequest(url: imageURL)
             cell.imageView?.af.setImage(withURLRequest: imageRequest)
+            return cell
         }
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

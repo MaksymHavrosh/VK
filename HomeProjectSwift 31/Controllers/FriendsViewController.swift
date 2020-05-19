@@ -104,7 +104,7 @@ extension FriendsViewController {
             
             if let imageURL = friend.imageURL {
                 let imageRequest = URLRequest(url: imageURL)
-                cell.imageView?.af.setImage(withURLRequest: imageRequest)
+                cell.imageView?.af.setImage(withURLRequest: imageRequest, placeholderImage: UIImage(named: "DefAva"))
             }
             return cell
         }
